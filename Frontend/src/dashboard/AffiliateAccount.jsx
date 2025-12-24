@@ -144,7 +144,8 @@ const AffiliateAccount = () => {
             <img
               src={user.profilePicture || "https://res.cloudinary.com/dxwtzb6pe/image/upload/v1757262791/oqwu4pod1xfyehprywc4.webp"}
               alt={user.firstName || "User"}
-              className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+              className="w-20 h-20 rounded-full object-contain border-2 border-gray-200 bg-gray-100"
+
               onError={(e) => {
                 e.target.src = "https://res.cloudinary.com/dxwtzb6pe/image/upload/v1757262791/oqwu4pod1xfyehprywc4.webp";
               }}
