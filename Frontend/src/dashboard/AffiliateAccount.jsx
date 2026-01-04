@@ -231,6 +231,8 @@ const AffiliateAccount = () => {
             👤 User Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
             {/* Left column */}
             <div className="space-y-3">
               <p className="text-gray-500 text-sm">Full Name</p>
@@ -242,17 +244,12 @@ const AffiliateAccount = () => {
               </p>
               <p className="text-gray-500 text-sm">Email</p>
               <p className="text-gray-800 font-medium">{user.email || 'N/A'}</p>
-              <p className="text-gray-500 text-sm">Affiliate ID</p>
-              <p className="text-gray-800 font-medium">{user.affiliateId || 'N/A'}</p>
             </div>
+
             {/* Right column */}
             <div className="space-y-3">
               <p className="text-gray-500 text-sm">Referral Code</p>
               <p className="text-gray-800 font-medium">{user.referralCode || 'N/A'}</p>
-              <p className="text-gray-500 text-sm">Joined</p>
-              <p className="text-gray-800 font-medium">
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-              </p>
               {commissionStats && (
                 <div>
                   <p className="text-gray-500 text-sm">Status</p>
@@ -265,6 +262,8 @@ const AffiliateAccount = () => {
                 </div>
               )}
             </div>
+
+
           </div>
         </Card>
 
