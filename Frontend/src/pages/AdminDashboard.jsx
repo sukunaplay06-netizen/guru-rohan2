@@ -7,7 +7,7 @@ import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { RefreshCw, Download, Send, MessageCircle, Users } from "lucide-react";
-import ChatComponent from "../components/ChatComponent";  // Chat component import
+import ChatComponent from "../components/ChatComponent";
 
 import CourseVideos from "../components/CourseVideos";
 import socket from "../components/socket";
@@ -39,66 +39,54 @@ export default function AdminDashboard() {
   };
 
 
+  // 1. Initial data fetch
   useEffect(() => {
-    console.log("[AdminDashboard] Component mounted, setting up sockets...");
     fetchDashboard();
-
     axios.get('/admin/purchased-users')
       .then(res => {
-        console.log("[Admin] Purchased users response:", res.data);
         setActiveUsers((res.data.users || []).map(u => ({
           ...u,
           id: u._id,
           userName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email
         })));
       })
-      .catch(err => console.error('Purchased users error:', err));
+      .catch(console.error);
 
     axios.get(`/admin/chat/messages?room=${adminRoom}&limit=50`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
-      .then(res => {
-        setChatMessages(res.data.messages || []);
-        console.log(`[AdminDashboard] Loaded ${res.data.messages?.length || 0} old messages`);
-      })
-      .catch(err => console.error('[AdminDashboard] Error loading old messages:', err.response?.data || err.message));
+      .then(res => setChatMessages(res.data.messages || []))
+      .catch(console.error);
 
-
-
-    console.log("[AdminDashboard] Joining admin room:", adminRoom);
-    socket.emit('joinRoom', { room: adminRoom, userName: adminName }, (ack) => {
-      console.log("[AdminDashboard] joinRoom ACK:", ack);
-    });
-
+    socket.emit('joinRoom', { room: adminRoom, userName: adminName });
     socket.emit('addUser', { userName: adminName, id: 'admin' });
 
-    socket.on('receiveMessage', (data) => {
-      console.log('[🔍 Admin Socket] receiveMessage received:', data);
-      if (data.room === currentRoom) {
-        setChatMessages(prev => [...prev, data]);
-      }
-    });
+  }, []); // ← runs once on mount
 
-    socket.on('adminMessage', (data) => {
-      console.log('[Socket Event] adminMessage:', data);
-      setChatMessages(prev => [...prev, { ...data, userName: 'Admin Broadcast' }]);
-    });
+  // 2. Socket listeners (top-level, separate useEffect)
+  useEffect(() => {
+    const handleReceiveMessage = (data) => {
+      if (data.room === currentRoom) setChatMessages(prev => [...prev, data]);
+    };
+    const handleAdminMessage = (data) => {
+      setChatMessages(prev => [...prev, { ...data, userName: 'Admin Broadcast', isBroadcast: true }]);
+    };
+    const handleActiveUsers = (users) => {
+      setOnlineUsers(users.filter(u => u.userName !== 'Admin').map(u => ({ ...u, id: u.id || u._id })));
+    };
 
-    socket.on('activeUsers', (users) => {
-      console.log('[Socket Event] activeUsers:', users);
-      setOnlineUsers(users.filter(u => u.userName !== 'Admin').map(u => ({
-        ...u,
-        id: u.id || u._id
-      })));
-    });
+    socket.on('receiveMessage', handleReceiveMessage);
+    socket.on('adminMessage', handleAdminMessage);
+    socket.on('activeUsers', handleActiveUsers);
 
     return () => {
-      console.log("[AdminDashboard] Cleaning up socket listeners...");
-      socket.off('receiveMessage');
-      socket.off('adminMessage');
-      socket.off('activeUsers');
+      socket.off('receiveMessage', handleReceiveMessage);
+      socket.off('adminMessage', handleAdminMessage);
+      socket.off('activeUsers', handleActiveUsers);
     };
-  }, [selectedUser]);
+  }, [currentRoom]); // ← currentRoom pe depend kare
+
+
 
 
   const fetchDashboard = async () => {
@@ -189,7 +177,7 @@ export default function AdminDashboard() {
       console.log('🔍 [Admin Frontend] Reply emit payload:', payload);  // ← Payload log
       console.log('🔍 [Admin Frontend] Current socket ID:', socket.id);  // ← Socket status
       socket.emit('adminReply', payload, (ack) => {
-        console.log('📤 [Admin Frontend] Server ACK for reply:', ack ? 'Success' : 'No ACK'); 
+        console.log('📤 [Admin Frontend] Server ACK for reply:', ack ? 'Success' : 'No ACK');
       });
       // Local add...
       setChatMessages(prev => [...prev, { ...payload, userName: adminName, message: replyMessage }]);
@@ -200,24 +188,18 @@ export default function AdminDashboard() {
   };
 
   const selectUser = (user) => {
-    // console.log('Selecting user:', user);
-    if (!user._id) {
-      // console.error('User ID missing!');
-      alert('Invalid user selected!');
-      return;
-    }
-    setSelectedUser(user);
+    if (!user._id) return alert('Invalid user selected!');
+
     const privateRoom = `private_${user._id}`;
+    setSelectedUser(user);
     setCurrentRoom(privateRoom);
+
     socket.emit('joinRoom', { room: privateRoom, userName: adminName });
-    console.log(`Joining private room: ${privateRoom}`);
+
     axios.get(`/chat/messages?room=${privateRoom}&limit=50`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
-      .then(res => {
-        setChatMessages(res.data.messages || []);
-        console.log(`Loaded private messages for ${privateRoom}`);
-      })
+      .then(res => setChatMessages(res.data.messages || []))
       .catch(err => console.error('Private messages error:', err.response?.data || err.message));
   };
 
@@ -397,23 +379,23 @@ export default function AdminDashboard() {
         </TabsContent>
 
 
-        
-<TabsContent value="chat" className="flex gap-4">
-  <ChatComponent 
-    selectedUser={selectedUser}
-    adminName={adminName}
-    token={localStorage.getItem('token')}
-    onSelectUser={selectUser}
-    onlineUsers={onlineUsers}
-    chatMessages={chatMessages}
-    onReply={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), senderId: 'admin' }])}
-    onBroadcast={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), isBroadcast: true }])}
-    replyMessage={replyMessage}
-    setReplyMessage={setReplyMessage}
-    broadcastMessage={broadcastMessage}
-    setBroadcastMessage={setBroadcastMessage}
-  />
-</TabsContent>
+
+        <TabsContent value="chat" className="flex gap-4">
+          <ChatComponent
+            selectedUser={selectedUser}
+            adminName={adminName}
+            token={localStorage.getItem('token')}
+            onSelectUser={selectUser}
+            onlineUsers={onlineUsers}
+            chatMessages={chatMessages}
+            onReply={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), senderId: 'admin' }])}
+            onBroadcast={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), isBroadcast: true }])}
+            replyMessage={replyMessage}
+            setReplyMessage={setReplyMessage}
+            broadcastMessage={broadcastMessage}
+            setBroadcastMessage={setBroadcastMessage}
+          />
+        </TabsContent>
 
 
       </Tabs>
