@@ -129,7 +129,7 @@ function Purchase() {
               //   }
               // );
               alert("✅ Payment successful. You are enrolled!");
-              navigate("/dashboard");
+              navigate("/dashboard", { replace: true });
             } else {
               // console.log("🚫 [Purchase.jsx] Verification failed", {
               //   message: verifyRes.data.message || "Unknown reason",
