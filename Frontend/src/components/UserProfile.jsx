@@ -408,8 +408,8 @@ const UserProfile = () => {
                       <h4 className="text-lg font-semibold text-gray-900 mb-2">Change Password</h4>
                       <p className="text-gray-600 mb-4">Update your password to keep your account secure</p>
 
-                      {/* Password Form */}
                       <form onSubmit={handleChangePassword} className="space-y-4">
+                        {/* Current Password */}
                         <div className="relative">
                           <label className="block text-sm font-medium text-gray-700 mb-2">Current Password *</label>
                           <input
@@ -418,13 +418,13 @@ const UserProfile = () => {
                             value={changePasswordForm.currentPassword}
                             onChange={handlePasswordChange}
                             placeholder="Enter your current password"
-                            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           />
                           <button
                             type="button"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-800 transition-colors hover:scale-110 active:scale-95"
+                            className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 hover:text-gray-900 transition-colors hover:scale-110 active:scale-95"
                           >
                             {showCurrentPassword ? (
                               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -439,6 +439,7 @@ const UserProfile = () => {
                           </button>
                         </div>
 
+                        {/* New Password */}
                         <div className="relative">
                           <label className="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
                           <input
@@ -447,17 +448,14 @@ const UserProfile = () => {
                             value={changePasswordForm.newPassword}
                             onChange={handlePasswordChange}
                             placeholder="Enter new password (min 8 chars)"
-                            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           />
                           <button
                             type="button"
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute inset-y-0 right-0 flex items-center px-3 
-             text-gray-500 hover:text-gray-800 transition-colors 
-             hover:scale-110 active:scale-95"
+                            className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 hover:text-gray-900 transition-colors hover:scale-110 active:scale-95"
                           >
-
                             {showNewPassword ? (
                               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -471,6 +469,7 @@ const UserProfile = () => {
                           </button>
                         </div>
 
+                        {/* Confirm Password */}
                         <div className="relative">
                           <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
                           <input
@@ -479,13 +478,13 @@ const UserProfile = () => {
                             value={changePasswordForm.confirmPassword}
                             onChange={handlePasswordChange}
                             placeholder="Confirm new password"
-                            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             required
                           />
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                            className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 hover:text-gray-900 transition-colors hover:scale-110 active:scale-95"
                           >
                             {showConfirmPassword ? (
                               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -500,7 +499,6 @@ const UserProfile = () => {
                           </button>
                         </div>
 
-                        {/* Password Error Message */}
                         {passwordError && (
                           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                             <p className="text-sm text-red-700">{passwordError}</p>
