@@ -12,13 +12,15 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+
   const {
     user,
-    setUser,
+    logout,
     hasEnrolledCourses,
     setHasEnrolledCourses,
     loading: authLoading
   } = useContext(AuthContext);
+
 
 
 
@@ -30,122 +32,59 @@ const Dashboard = () => {
   //   timestamp: new Date().toISOString(),
   // });
 
-  // Redirect check
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth/login');
-    }
-  }, [user, authLoading, navigate]);
 
 
   const fetchData = async () => {
-    console.time('fetchData');
-    // console.log('🚀 [Dashboard.jsx] Starting fetchData', { timestamp: new Date().toISOString() });
     setLoading(true);
     setError(null);
+
     try {
-      // Fetch user data if not available
       let userData = user;
+
       if (!user?.firstName || !user?.email || !user?.affiliateId) {
-        // console.log('🔄 [Dashboard.jsx] Fetching user data from /auth/me', { timestamp: new Date().toISOString() });
         const userRes = await axios.get('/auth/me');
         userData = userRes.data.user;
-        setUser(userData);
-        // console.log('✅ [Dashboard.jsx] /auth/me response:', { user: userData, timestamp: new Date().toISOString() });
-        localStorage.setItem('user', JSON.stringify(userData));
       }
-      // console.log('👤 [Dashboard.jsx] User before enrolled-courses fetch:', {
-      //   userId: userData?._id,
-      //   email: userData?.email,
-      //   timestamp: new Date().toISOString(),
-      // });
 
       const [courseRes, commissionRes] = await Promise.all([
         axios.get('/user/enrolled-courses'),
         axios.get('/referral/metrics'),
       ]);
-      // console.log('✅ [Dashboard.jsx] API responses:', {
-      //   enrolledCourses: courseRes.data,
-      //   commissionMetrics: commissionRes.data,
-      //   timestamp: new Date().toISOString(),
-      // });
 
       const enrolledCourses = courseRes.data.enrolledCourses || [];
-      // console.log('📚 [Dashboard.jsx] Enrolled courses details:', {
-      //   count: enrolledCourses.length,
-      //   courses: enrolledCourses,
-      //   timestamp: new Date().toISOString(),
-      // });
       setCourses(enrolledCourses);
       setHasEnrolledCourses(enrolledCourses.length > 0);
-      if (enrolledCourses.length === 0) {
-        return;
-      }
 
+      if (enrolledCourses.length === 0) return;
 
-
-      // Set commission stats
-      if (commissionRes.data && commissionRes.data.success) {
+      if (commissionRes.data?.success) {
         setCommissionStats(commissionRes.data);
       } else {
-        setError('Commission data unavailable');
         setCommissionStats({});
+        setError('Commission data unavailable');
       }
+
     } catch (err) {
-      // console.error('❌ [Dashboard.jsx] fetchData error:', {
-      //   message: err.message,
-      //   response: err.response?.data,
-      //   status: err.response?.status,
-      //   headers: err.response?.headers,
-      //   timestamp: new Date().toISOString(),
-      // });
       setError('Failed to load data. Redirecting to home...');
       setHasEnrolledCourses(false);
       navigate('/', { replace: true });
     } finally {
       setLoading(false);
-      // console.timeEnd('fetchData');
     }
   };
 
+
   useEffect(() => {
-    let isMounted = true;
-    if (user) {
-      // console.log('🔁 [Dashboard.jsx] useEffect triggered for fetchData', {
-      //   userExists: !!user,
-      //   timestamp: new Date().toISOString(),
-      // });
-      fetchData().then(() => {
-        if (!isMounted) return;
-      });
-    }
-    return () => { isMounted = false; };
+    if (user) fetchData();
   }, [user]);
 
 
-  const handleLogout = () => {
-    try {
-      // console.log("🚪 Logging out user...");
 
-      // 1️⃣ Clear local storage
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
-      // 2️⃣ Reset user in context
-      setUser(null);
-
-      // 3️⃣ Clear axios token header (safe method)
-      if (axios.defaults.headers.common["Authorization"]) {
-        axios.defaults.headers.common["Authorization"] = "";
-      }
-
-      // 4️⃣ Redirect to login
-      navigate("/auth/login", { replace: true });
-    } catch (err) {
-      // console.error("❌ Error in logout:", err.message);
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth/login');
     }
-  };
-
+  }, [user, authLoading, navigate]);
 
 
   if (loading)
@@ -197,12 +136,12 @@ const Dashboard = () => {
             { icon: 'fas fa-question-circle', label: 'Leaderboard', path: '/dashboard/leaderboard' },
             // { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
             { icon: 'fas fa-headset', label: 'Support', path: '/dashboard/support' },
-            // { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
+            { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
           ].map((item, index) => (
             item.isLogout ? (
               <button
                 key={index}
-                onClick={handleLogout}
+                onClick={logout}
                 className="menu-item p-3 mx-2 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 border-l-4 rounded-r-lg border-transparent hover:bg-white/5 hover:border-white/30"
               >
                 <i className={`${item.icon} w-5 text-center text-sm`}></i>
@@ -296,7 +235,7 @@ const Dashboard = () => {
                 { icon: 'fas fa-question-circle', label: 'Leaderboard', path: '/dashboard/leaderboard' },
                 // { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
                 { icon: 'fas fa-headset', label: 'Support', path: '/dashboard/support' },
-                // { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
+                { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
 
               ].map((item, index) => (
                 item.isLogout ? (
@@ -348,13 +287,14 @@ const Dashboard = () => {
                   <div className="user-name font-medium text-sm truncate">{user?.firstName || 'User'}</div>
                   <div className="user-role text-white/70 text-xs">Premium Affiliate</div>
                 </div>
-                {/* <button
-                  onClick={handleLogout}
+                <button
+                  onClick={logout}
                   className="p-1 rounded hover:bg-white/10 transition-colors"
                   title="Logout"
                 >
+
                   <i className="fas fa-sign-out-alt text-sm"></i>
-                </button> */}
+                </button>
 
               </div>
             </div>

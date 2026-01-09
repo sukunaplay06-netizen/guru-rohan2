@@ -5,19 +5,26 @@ import { AuthContext } from "../context/AuthContext";
 const ProtectedRoute = () => {
   const { isLoggedIn, loading, hasEnrolledCourses } = useContext(AuthContext);
 
-  if (loading) return null;
+  // ⏳ Loader
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20vh" }}>
+        Checking authentication...
+      </div>
+    );
+  }
 
-  // 🔴 Not logged in → Login
+  // 🔴 Not logged in
   if (!isLoggedIn) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // 🟡 Logged in but NO COURSE → HOME
+  // 🟡 Logged in but no course
   if (!hasEnrolledCourses) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/courses" replace />;
   }
 
-  // ✅ Logged in + Course → Dashboard allowed
+  // ✅ Allowed
   return <Outlet />;
 };
 

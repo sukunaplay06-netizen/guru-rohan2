@@ -5,10 +5,8 @@ import instance from '../api/axios';
 
 export const AuthContext = createContext();
 
-// New: Wrapped
-if (process.env.NODE_ENV === 'development') {
-  // console.log('🔑 [AuthContext.js] updateAuthState - Token:', token, 'UserData:', userData);
-}
+
+let isLoggingOut = false;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -41,83 +39,55 @@ export const AuthProvider = ({ children }) => {
 
 
   const updateAuthState = async () => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    setLoading(true);
 
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token');
 
-        setUser(parsedUser);
-        setIsLoggedIn(true);
-        setIsAdmin(parsedUser.isAdmin === true);
+      // 🔥 axios header set
+      instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        // 🔥 ADD THIS
-        await checkEnrolledCourses(token);
+      // 🔐 backend se verify
+      const res = await instance.get('/auth/profile', {
+        withCredentials: true,
+      });
 
-      } catch (error) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        setIsLoggedIn(false);
-        setIsAdmin(false);
-        setHasEnrolledCourses(false);
-      }
-    } else {
+      const userData = res.data;
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      setUser(userData);
+      setIsLoggedIn(true);
+      setIsAdmin(userData.isAdmin === true);
+
+      await checkEnrolledCourses(token);
+
+    } catch (err) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      delete instance.defaults.headers.common['Authorization'];
+
       setUser(null);
       setIsLoggedIn(false);
       setIsAdmin(false);
       setHasEnrolledCourses(false);
+    } finally {
+      setLoading(false);
     }
   };
 
-
-
   useEffect(() => {
-    console.log('⏳ [AuthContext.js] Starting initial auth check at:', new Date().toISOString());
-    const verifyAuth = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        // console.log('🔑 [AuthContext.js] Verifying token:', token, 'at:', new Date().toISOString());
-        if (token) {
-          const res = await instance.get('/auth/profile', {
-            headers: { Authorization: `Bearer ${token}` },
-            withCredentials: true,
-          });
-          // console.log('📥 [AuthContext.js] Profile response at:', new Date().toISOString(), res.data);
-          const userData = res.data;
-          localStorage.setItem('user', JSON.stringify(userData));
-          setUser(userData);
-          setIsLoggedIn(true);
-          setIsAdmin(userData.isAdmin === true);
-
-          await checkEnrolledCourses(token);
-        } else {
-          console.log('🚨 [verifyAuth] No token found');
-        }
-      } catch (err) {
-        console.error('❌ [AuthContext.js] Auth verify failed at:', new Date().toISOString(), err.response?.data || err.message);
-        if (err.response?.status === 401) {
-          console.log('🔄 [AuthContext.js] Token expired, attempting refresh...');
-          await refreshToken();
-        } else {
-          if (localStorage.getItem('token')) {
-            logout();
-          }
-        }
-      } finally {
-        console.log('✅ [AuthContext.js] Auth check complete at:', new Date().toISOString());
-        setLoading(false);
-      }
-    };
-
-    verifyAuth();
+    updateAuthState();
   }, []);
+
 
 
   const login = async (userData, token) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
+
+    instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
 
     const hasCourse = await checkEnrolledCourses(token);
 
@@ -131,30 +101,34 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     console.log('🚪 [AuthContext.js] Logging out at:', new Date().toISOString());
 
-    // 🧹 1️⃣ Clear localStorage
+    // 🔥 VERY IMPORTANT
+    isLoggingOut = true;
+
+    // 🧹 clear storage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 
-    // 🚫 2️⃣ Remove Authorization header from axios
+    // 🚫 remove axios auth header
     delete instance.defaults.headers.common['Authorization'];
 
-    // 🔄 3️⃣ Reset context states
+    // 🔄 reset states
     setUser(null);
     setIsLoggedIn(false);
     setIsAdmin(false);
     setHasEnrolledCourses(false);
 
-    // 🧭 4️⃣ Optional: redirect user (if called outside Dashboard)
-    if (window.location.pathname !== '/auth/login') {
-      window.location.href = '/auth/login';
-    }
+    // 🧭 HARD redirect (prevents auto re-login)
+    window.location.replace('/auth/login');
   };
 
 
+
   const refreshToken = async () => {
+    if (isLoggingOut) return;
     try {
       console.log('🔄 [AuthContext.js] Attempting token refresh...');
       const response = await instance.post('/auth/refresh', {}, { withCredentials: true });
+      if (isLoggingOut) return;
       const { token: newToken, userData } = response.data;
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -173,13 +147,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (isLoggedIn && user) {
-        console.log('⏰ [AuthContext.js] Refreshing token... at:', new Date().toISOString());
+      if (!isLoggingOut && isLoggedIn && user) {
         await refreshToken();
       }
     }, 15 * 60 * 1000);
+
     return () => clearInterval(interval);
   }, [isLoggedIn, user]);
+
 
   return (
     <AuthContext.Provider
