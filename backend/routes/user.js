@@ -4,7 +4,6 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const {
   protect,
-  checkEnrolledCourses,
 } = require("../middleware/authMiddleware");
 const User = require("../models/User");
 const Course = require("../models/Course");
@@ -43,7 +42,6 @@ router.get("/my-courses/:id/videos", protect, async (req, res) => {
 router.get(
   "/enrolled-courses",
   protect,
-  checkEnrolledCourses,
   async (req, res) => {
     try {
       const userId = req.user._id;
@@ -75,7 +73,7 @@ router.get("/by-referral-code/:code", async (req, res) => {
 });
 
 // ✅ GET /api/user/referrals
-router.get("/referrals", protect, checkEnrolledCourses, async (req, res) => {
+router.get("/referrals", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -98,49 +96,10 @@ router.get("/referrals", protect, checkEnrolledCourses, async (req, res) => {
   }
 });
 
-// change in user
-// ✅ GET /api/user/referral/metrics — fetch referral metrics including total sales
-// router.get(
-//   "/referral/metrics",
-//   protect,
-//   checkEnrolledCourses,
-//   async (req, res) => {
-//     try {
-//       const user = await User.findById(req.user._id);
-//       if (!user) {
-//         return res.status(404).json({ message: "❌ User not found" });
-//       }
 
-//       const referrals = await User.find({ referredBy: user._id }).select("_id");
-//       const totalSales = await Purchase.countDocuments({
-//         user: { $in: referrals.map((r) => r._id) },
-//       });
-
-//       res.json({
-//         success: true,
-//         totalSales, // Number of sales from referrals
-//         todayEarnings: 0,
-//         last7DaysEarnings: 0,
-//         last30DaysEarnings: 0,
-//         allTimeEarnings: user.affiliateEarnings || 0,
-//         accountBalance: user.affiliateEarnings - (user.commissionPaid || 0),
-//         totalReferrals: referrals.length,
-//         commissionPaid: user.commissionPaid || 0,
-//         status: user.isActive ? "active" : "pending",
-//         isKycComplete: user.kycDetails?.isKycComplete || false,
-//       });
-//     } catch (err) {
-//       console.error("❌ Error fetching referral metrics:", err);
-//       res.status(500).json({ message: "❌ Failed to fetch referral metrics" });
-//     }
-//   }
-// );
-
-// ✅ GET /api/user/referral/metrics — fetch referral metrics including total sales
 router.get(
   "/referral/metrics",
   protect,
-  checkEnrolledCourses,
   async (req, res) => {
     try {
       const user = await User.findById(req.user._id);
@@ -184,7 +143,6 @@ router.get(
 router.post(
   "/account-info",
   protect,
-  checkEnrolledCourses,
   async (req, res) => {
     try {
       console.log("POST /api/user/account-info - Request body:", req.body);
@@ -256,7 +214,6 @@ router.post(
 router.get(
   "/payout-details",
   protect,
-  checkEnrolledCourses,
   async (req, res) => {
     try {
       console.log("GET /api/user/payout-details - User ID:", req.user._id);
@@ -351,7 +308,7 @@ router.put("/change-password", protect, async (req, res) => {
 });
 
 // ✅ GET /api/user/profile — get current logged in user info
-router.get("/profile", protect, checkEnrolledCourses, async (req, res) => {
+router.get("/profile", protect, async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (!user) return res.status(404).json({ message: "User not found" });
   res.json(user);

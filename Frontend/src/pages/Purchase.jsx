@@ -1,5 +1,6 @@
 //Frontend/src/pages/Purchase.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 
@@ -17,6 +18,8 @@ function Purchase() {
   const { courseSlug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { updateAuthState } = useContext(AuthContext);
+
   const [course, setCourse] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -122,19 +125,14 @@ function Purchase() {
             // });
 
             if (verifyRes.data.success) {
-              // console.log(
-              //   "🚀 [Purchase.jsx] Payment successful, navigating to dashboard",
-              //   {
-              //     timestamp: new Date().toISOString(),
-              //   }
-              // );
               alert("✅ Payment successful. You are enrolled!");
+            
+              await updateAuthState();     
               navigate("/dashboard", { replace: true });
+
+
             } else {
-              // console.log("🚫 [Purchase.jsx] Verification failed", {
-              //   message: verifyRes.data.message || "Unknown reason",
-              //   timestamp: new Date().toISOString(),
-              // });
+
               alert("❌ Payment verification failed");
             }
           } catch (err) {

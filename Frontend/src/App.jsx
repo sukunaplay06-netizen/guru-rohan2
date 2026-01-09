@@ -131,7 +131,7 @@ function AppContent() {
           <Route path="/api/purchase/:courseSlug" element={<Purchase />} />
           <Route path="/purchase-all" element={isLoggedIn ? <PurchaseAll /> : <Navigate to="/auth/login" replace />} />
           <Route path="/dashboard/my-courses" element={<MyCourses />} />
-          <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/auth/login" replace />} />
+          {/* <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/auth/login" replace />} /> */}
           <Route path="/referrals" element={isLoggedIn ? <ReferralPage /> : <Navigate to="/auth/login" replace />} />
           <Route path="/admin-dashboard" element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/auth/login" replace />} />
 

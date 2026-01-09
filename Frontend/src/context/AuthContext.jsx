@@ -18,43 +18,44 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [hasEnrolledCourses, setHasEnrolledCourses] = useState(false);
 
-  const checkEnrolledCourses = async (token) => {
+  const checkEnrolledCourses = async (token, retry = 0) => {
     try {
-      const courseRes = await instance.get('/user/enrolled-courses', {
+      const res = await instance.get('/user/enrolled-courses', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const enrolledCourses = courseRes.data.enrolledCourses || [];
-      setHasEnrolledCourses(enrolledCourses.length > 0);
-      console.log('✅ [AuthContext.js] Enrolled courses check:', {
-        hasCourses: enrolledCourses.length > 0,
-        count: enrolledCourses.length,
-        timestamp: new Date().toISOString(),
-      });
-      return enrolledCourses.length > 0;
-    } catch (err) {
-      console.error('❌ [AuthContext.js] Error checking enrolled courses:', err.response?.data || err.message);
+
+      const enrolled = res.data.enrolledCourses || [];
+
+      if (enrolled.length === 0 && retry < 2) {
+        await new Promise(r => setTimeout(r, 1500));
+        return checkEnrolledCourses(token, retry + 1);
+      }
+
+      setHasEnrolledCourses(enrolled.length > 0);
+      return enrolled.length > 0;
+    } catch {
       setHasEnrolledCourses(false);
       return false;
     }
   };
 
+
   const updateAuthState = async () => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    // console.log('🔑 [AuthContext.js] updateAuthState - Token:', token, 'UserData:', userData);
-
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        // console.log('✅ [AuthContext.js] Parsed user:', parsedUser);
 
         setUser(parsedUser);
         setIsLoggedIn(true);
         setIsAdmin(parsedUser.isAdmin === true);
 
+        // 🔥 ADD THIS
+        await checkEnrolledCourses(token);
+
       } catch (error) {
-        console.error('❌ [AuthContext.js] Error parsing user data:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
@@ -63,13 +64,13 @@ export const AuthProvider = ({ children }) => {
         setHasEnrolledCourses(false);
       }
     } else {
-      console.log("🚨 [updateAuthState] No token or user found");
       setUser(null);
       setIsLoggedIn(false);
       setIsAdmin(false);
       setHasEnrolledCourses(false);
     }
   };
+
 
 
   useEffect(() => {
@@ -105,7 +106,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } finally {
-        console.log('✅ [AuthContext.js] Auth check complete at:', new Date().toISOString());  
+        console.log('✅ [AuthContext.js] Auth check complete at:', new Date().toISOString());
         setLoading(false);
       }
     };
@@ -115,14 +116,17 @@ export const AuthProvider = ({ children }) => {
 
 
   const login = async (userData, token) => {
-    // console.log('🔐 [AuthContext.js] Logging in with:', { userData, token });
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
 
-    await checkEnrolledCourses(token);
+    const hasCourse = await checkEnrolledCourses(token);
 
-    await updateAuthState();
+    setUser(userData);
+    setIsLoggedIn(true);
+    setIsAdmin(userData.isAdmin === true);
+    setHasEnrolledCourses(hasCourse);
   };
+
 
   const logout = () => {
     console.log('🚪 [AuthContext.js] Logging out at:', new Date().toISOString());
@@ -190,6 +194,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         hasEnrolledCourses,
+        setHasEnrolledCourses,
         refreshToken,
       }}
     >

@@ -5,15 +5,22 @@ import axios from '../api/axios';
 import { useLocation } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
-  const [hasEnrolledCourses, setHasEnrolledCourses] = useState(false);
   const [commissionStats, setCommissionStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const {
+    user,
+    setUser,
+    hasEnrolledCourses,
+    setHasEnrolledCourses,
+    loading: authLoading
+  } = useContext(AuthContext);
+
+
 
   // Log user data on mount
   // console.log('📍 [Dashboard.jsx] Current location:', {
@@ -25,12 +32,11 @@ const Dashboard = () => {
 
   // Redirect check
   useEffect(() => {
-    if (!user && !loading) {
-      // console.log('🚫 [Dashboard.jsx] No user, redirecting to login', { timestamp: new Date().toISOString() });
+    if (!authLoading && !user) {
       navigate('/auth/login');
-      return;
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
+
 
   const fetchData = async () => {
     console.time('fetchData');
@@ -71,19 +77,12 @@ const Dashboard = () => {
       //   timestamp: new Date().toISOString(),
       // });
       setCourses(enrolledCourses);
-
+      setHasEnrolledCourses(enrolledCourses.length > 0);
       if (enrolledCourses.length === 0) {
-        // console.log('🚫 [Dashboard.jsx] No enrolled courses detected (even after purchase?), redirecting to home', {
-        //   possibleReasons: 'Purchase may not have enrolled yet, or backend delay/API error',
-        //   timestamp: new Date().toISOString(),
-        // });
-        // console.log('🚫 [Dashboard.jsx] No enrolled courses, redirecting to home', { timestamp: new Date().toISOString() });
-        setHasEnrolledCourses(false);
-        navigate('/');
         return;
       }
 
-      setHasEnrolledCourses(true);
+
 
       // Set commission stats
       if (commissionRes.data && commissionRes.data.success) {
@@ -102,7 +101,7 @@ const Dashboard = () => {
       // });
       setError('Failed to load data. Redirecting to home...');
       setHasEnrolledCourses(false);
-      navigate('/');
+      navigate('/', { replace: true });
     } finally {
       setLoading(false);
       // console.timeEnd('fetchData');
@@ -156,7 +155,8 @@ const Dashboard = () => {
       </div>
     );
 
-  if (!hasEnrolledCourses) {
+  if (!authLoading && !loading && !hasEnrolledCourses) {
+
     // console.log('🛑 [Dashboard.jsx] Rendering no courses message (redirect may have failed)', { timestamp: new Date().toISOString() });
     return (
       <div className="flex justify-center items-center h-screen bg-[#f5f7fb] text-[#212529]">
