@@ -186,13 +186,13 @@ const Dashboard = () => {
               <div className="user-name font-medium text-sm truncate">{user?.firstName || 'User'}</div>
               <div className="user-role text-white/70 text-xs">Premium Affiliate</div>
             </div>
-            {/* <button
-              onClick={handleLogout} // 🔹 Use handleLogout
+            <button
+              onClick={logout}
               className="p-1 rounded hover:bg-white/10 transition-colors"
               title="Logout"
             >
               <i className="fas fa-sign-out-alt text-sm"></i>
-            </button> */}
+            </button>
 
           </div>
         </div>
