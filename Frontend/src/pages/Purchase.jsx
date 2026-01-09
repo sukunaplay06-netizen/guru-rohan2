@@ -126,9 +126,12 @@ function Purchase() {
 
             if (verifyRes.data.success) {
               alert("✅ Payment successful. You are enrolled!");
-            
-              await updateAuthState();     
-              navigate("/dashboard", { replace: true });
+
+              await updateAuthState();
+              setTimeout(() => {
+                navigate("/dashboard", { replace: true });
+              }, 500);
+
 
 
             } else {
