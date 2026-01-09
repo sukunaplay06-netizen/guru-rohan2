@@ -241,7 +241,7 @@ const Dashboard = () => {
                 item.isLogout ? (
                   <button
                     key={index}
-                    onClick={handleLogout} // 🔹 Call logout function
+                    onClick={logout}
                     className="menu-item p-3 mx-2 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 border-l-4 rounded-r-lg border-transparent hover:bg-white/5 hover:border-white/30"
                   >
                     <i className={`${item.icon} w-5 text-center text-sm`}></i>
