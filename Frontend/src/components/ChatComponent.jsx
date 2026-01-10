@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Send, MessageCircle, Users } from "lucide-react";
-import socket from "./socket";
 
 const ChatComponent = ({
   selectedUser,
   adminName,
   onSelectUser,
-  onlineUsers,
-  chatMessages,
+  onlineUsers = [],    
+  chatMessages = [],    
   onReply,
   onBroadcast,
   replyMessage,
@@ -17,41 +16,29 @@ const ChatComponent = ({
   setBroadcastMessage
 }) => {
 
+
   const handleReply = () => {
     if (replyMessage.trim() && selectedUser?._id) {
-      const privateRoom = `private_${selectedUser._id}`;
-
-      socket.emit("adminReply", {
-        room: privateRoom,
-        message: replyMessage,
-        adminName,
-        targetUserId: selectedUser._id
-      });
-
-      onReply(replyMessage);
+      onReply();
       setReplyMessage("");
     }
   };
 
-  const handleBroadcast = () => {
-    if (broadcastMessage.trim()) {
-      socket.emit("adminBroadcast", {
-        message: broadcastMessage,
-        adminName
-      });
+const handleBroadcast = () => {
+  if (broadcastMessage.trim()) {
+    onBroadcast(broadcastMessage);
+    setBroadcastMessage("");
+  }
+};
 
-      onBroadcast(broadcastMessage);
-      setBroadcastMessage("");
-    }
-  };
-
+ 
   return (
     <div className="flex gap-4">
       {/* USERS */}
       <div className="w-1/3 bg-gray-50 p-4 rounded border">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <Users className="h-4 w-4" />
-          Online Users ({onlineUsers.length})
+          Online Users ({Array.isArray(onlineUsers) ? onlineUsers.length : 0})
         </h3>
 
         <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -137,3 +124,4 @@ const ChatComponent = ({
 };
 
 export default ChatComponent;
+

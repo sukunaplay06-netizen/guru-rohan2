@@ -39,9 +39,10 @@ export default function AdminDashboard() {
   };
 
 
-  // 1. Initial data fetch
+  // ✅ FIXED - only API calls
   useEffect(() => {
     fetchDashboard();
+
     axios.get('/admin/purchased-users')
       .then(res => {
         setActiveUsers((res.data.users || []).map(u => ({
@@ -58,33 +59,47 @@ export default function AdminDashboard() {
       .then(res => setChatMessages(res.data.messages || []))
       .catch(console.error);
 
-    socket.emit('joinRoom', { room: adminRoom, userName: adminName });
-    socket.emit('addUser', { userName: adminName, id: 'admin' });
+  }, []);
 
-  }, []); // ← runs once on mount
-
-  // 2. Socket listeners (top-level, separate useEffect)
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+
+    socket.emit("joinRoom", {
+      room: "general",
+      userName: adminName,
+      isAdmin: true,
+    });
+
     const handleReceiveMessage = (data) => {
-      if (data.room === currentRoom) setChatMessages(prev => [...prev, data]);
-    };
-    const handleAdminMessage = (data) => {
-      setChatMessages(prev => [...prev, { ...data, userName: 'Admin Broadcast', isBroadcast: true }]);
-    };
-    const handleActiveUsers = (users) => {
-      setOnlineUsers(users.filter(u => u.userName !== 'Admin').map(u => ({ ...u, id: u.id || u._id })));
+      setChatMessages(prev => [...prev, data]);
     };
 
-    socket.on('receiveMessage', handleReceiveMessage);
-    socket.on('adminMessage', handleAdminMessage);
-    socket.on('activeUsers', handleActiveUsers);
+    const handleAdminMessage = (data) => {
+      setChatMessages(prev => [
+        ...prev,
+        { ...data, isBroadcast: true },
+      ]);
+    };
+
+    const handleActiveUsers = (users = []) => {
+      setOnlineUsers(Array.isArray(users) ? users.filter(u => !u.isAdmin) : []);
+    };
+
+
+    socket.on("receiveMessage", handleReceiveMessage);
+    socket.on("adminMessage", handleAdminMessage);
+    socket.on("activeUsers", handleActiveUsers);
 
     return () => {
-      socket.off('receiveMessage', handleReceiveMessage);
-      socket.off('adminMessage', handleAdminMessage);
-      socket.off('activeUsers', handleActiveUsers);
+      socket.off("receiveMessage", handleReceiveMessage);
+      socket.off("adminMessage", handleAdminMessage);
+      socket.off("activeUsers", handleActiveUsers);
+      socket.disconnect();
     };
-  }, [currentRoom]); // ← currentRoom pe depend kare
+  }, []);
 
 
 
@@ -191,18 +206,22 @@ export default function AdminDashboard() {
     if (!user._id) return alert('Invalid user selected!');
 
     const privateRoom = `private_${user._id}`;
+
     setSelectedUser(user);
     setCurrentRoom(privateRoom);
 
-    socket.emit('joinRoom', { room: privateRoom, userName: adminName });
+    socket.emit("joinRoom", {
+      room: privateRoom,
+      userName: adminName,
+      isAdmin: true,
+    });
 
     axios.get(`/chat/messages?room=${privateRoom}&limit=50`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => setChatMessages(res.data.messages || []))
-      .catch(err => console.error('Private messages error:', err.response?.data || err.message));
+      .catch(console.error);
   };
-
 
 
   return (
@@ -388,8 +407,8 @@ export default function AdminDashboard() {
             onSelectUser={selectUser}
             onlineUsers={onlineUsers}
             chatMessages={chatMessages}
-            onReply={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), senderId: 'admin' }])}
-            onBroadcast={(msg) => setChatMessages(prev => [...prev, { userName: adminName, message: msg, timestamp: Date.now(), isBroadcast: true }])}
+            onReply={handleReply}
+            onBroadcast={handleBroadcast}
             replyMessage={replyMessage}
             setReplyMessage={setReplyMessage}
             broadcastMessage={broadcastMessage}

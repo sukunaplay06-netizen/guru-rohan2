@@ -1,52 +1,90 @@
-const Message = require('../models/Message'); 
+const Message = require('../models/Message');
 
-// Get all messages (admin only - room filter add)
+// ================================
+// GET chat messages (room wise)
+// ================================
 const getMessages = async (req, res) => {
   try {
-    const { room } = req.query;  // Room filter
-    const query = room ? { room } : {};
-    const messages = await Message.find(query).sort({ createdAt: 1 }).limit(50).lean();  // Limit add for performance
-    const formattedMessages = messages.map(m => ({  // Formatting add kiya (frontend match)
-      ...m,
+    const { room, limit = 50 } = req.query;
+
+    if (!room) {
+      return res.status(400).json({ message: 'Room is required' });
+    }
+
+    const messages = await Message.find({ room })
+      .sort({ createdAt: 1 })
+      .limit(parseInt(limit));
+
+    const formattedMessages = messages.map(m => ({
+      _id: m._id,
+      room: m.room,
       userName: m.user,
       message: m.text,
-      timestamp: m.createdAt.getTime()
+      timestamp: m.createdAt.getTime(),
+      isAdminReply: m.isAdminReply,
+      isBroadcast: m.isBroadcast,
     }));
+
     res.json({ success: true, messages: formattedMessages });
   } catch (err) {
-    console.error('Error fetching messages:', err);
+    console.error('❌ getMessages error:', err);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
-// Post a new message (admin/user - room add)
+// ================================
+// POST message (user / admin)
+// ================================
 const postMessage = async (req, res) => {
   try {
-    const { user, text, room } = req.body;  // Room add
-    if (!room) return res.status(400).json({ message: 'Room required' });
-    const newMessage = await Message.create({ user, text, room });
-    res.status(201).json({ success: true, message: newMessage });
-  } catch (err) {
-    console.error('Error posting message:', err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-};
+    const { user, text, room, isAdmin } = req.body;
 
-// Naya: Admin broadcast post
-const adminBroadcast = async (req, res) => {
-  try {  // Try-catch add kiya (error handling)
-    const { adminName, message } = req.body;
+    if (!room || !text) {
+      return res.status(400).json({ message: 'Room & text required' });
+    }
+
     const newMessage = await Message.create({
-      user: adminName,
-      text: message,
-      room: "general",
-      isBroadcast: true  // Model mein add karo agar nahi hai
+      user,
+      text,
+      room,
+      isAdminReply: isAdmin === true,
     });
+
     res.status(201).json({ success: true, message: newMessage });
   } catch (err) {
-    console.error('Error broadcasting:', err);  // Log add
+    console.error('❌ postMessage error:', err);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
-module.exports = { getMessages, postMessage, adminBroadcast };
+// ================================
+// ADMIN broadcast message
+// ================================
+const adminBroadcast = async (req, res) => {
+  try {
+    const { adminName, message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ message: 'Message required' });
+    }
+
+    const newMessage = await Message.create({
+      user: adminName || 'Admin',
+      text: message,
+      room: 'general',          // 🔥 socket.io ke saath match
+      isBroadcast: true,
+      isAdminReply: true,
+    });
+
+    res.status(201).json({ success: true, message: newMessage });
+  } catch (err) {
+    console.error('❌ adminBroadcast error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+module.exports = {
+  getMessages,
+  postMessage,
+  adminBroadcast,
+};
