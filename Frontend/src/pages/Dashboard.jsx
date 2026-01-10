@@ -134,7 +134,7 @@ const Dashboard = () => {
             { icon: 'fas fa-file-invoice-dollar', label: 'Payouts', path: '/dashboard/payout-settings' },
             { icon: 'fas fa-cog', label: 'Profile', path: '/dashboard/profile' },
             { icon: 'fas fa-question-circle', label: 'Leaderboard', path: '/dashboard/leaderboard' },
-            // { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
+            { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
             { icon: 'fas fa-headset', label: 'Support', path: '/dashboard/support' },
             { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
           ].map((item, index) => (
@@ -186,13 +186,13 @@ const Dashboard = () => {
               <div className="user-name font-medium text-sm truncate">{user?.firstName || 'User'}</div>
               <div className="user-role text-white/70 text-xs">Premium Affiliate</div>
             </div>
-            <button
+            {/* <button
               onClick={logout}
               className="p-1 rounded hover:bg-white/10 transition-colors"
               title="Logout"
             >
               <i className="fas fa-sign-out-alt text-sm"></i>
-            </button>
+            </button> */}
 
           </div>
         </div>
@@ -233,7 +233,7 @@ const Dashboard = () => {
                 { icon: 'fas fa-file-invoice-dollar', label: 'Payouts', path: '/dashboard/payout-settings' },
                 { icon: 'fas fa-cog', label: 'Profile', path: '/dashboard/profile' },
                 { icon: 'fas fa-question-circle', label: 'Leaderboard', path: '/dashboard/leaderboard' },
-                // { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
+                { icon: 'fas fa-comments', label: 'Live Chat', path: '/dashboard/chat' },
                 { icon: 'fas fa-headset', label: 'Support', path: '/dashboard/support' },
                 { icon: 'fas fa-sign-out-alt', label: 'Log Out', isLogout: true }
 
