@@ -54,7 +54,7 @@ function RefundPolicy() {
               To request a refund, contact our support team within{" "}
               <strong> 24 hours</strong> of your purchase at{" "}
               <a
-                href="mailto:support@leadsguru.com"
+                href="mailto:support@leadsgurukul.com"
                 className="text-purple-700 font-medium hover:underline"
               >
                 support@leadsgurukul.com

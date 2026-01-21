@@ -53,6 +53,11 @@ import FAQ from './pages/FAQ';
 import UserProfile from './components/UserProfile';
 import Support from './pages/Support';
 import ChatComponent from './components/ChatComponent';
+import DeliveryPolicy from './pages/DeliveryPolicy';
+import CookiePolicy from './pages/CookiePolicy';
+import AffiliateDisclaimer from './pages/AffiliateDisclaimer';
+import GrievanceRedressal from './pages/GrievanceRedressal';
+import LegalNotice from './pages/LegalNotice';
 
 function PublicLayout({ children }) {
   return (
@@ -184,6 +189,13 @@ function AppContent() {
           <Route path="/auth/terms" element={<Terms />} />
           <Route path="/auth/about-us" element={<AboutUs />} />
           <Route path="/auth/contact-us" element={<ContactUs />} />
+
+          <Route path="/auth/delivery-policy" element={<DeliveryPolicy />} />
+          <Route path="/auth/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/auth/affiliate-disclaimer" element={<AffiliateDisclaimer />} />
+          <Route path="/auth/grievance-redressal" element={<GrievanceRedressal />} />
+          <Route path="/auth/legal-notice" element={<LegalNotice />} />
+
 
         </Routes>
       </div>
