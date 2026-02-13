@@ -59,6 +59,9 @@ import AffiliateDisclaimer from './pages/AffiliateDisclaimer';
 import GrievanceRedressal from './pages/GrievanceRedressal';
 import LegalNotice from './pages/LegalNotice';
 
+import AffiliateOverview from "./dashboard/AffiliateOverview";
+
+
 function PublicLayout({ children }) {
   return (
     <>
@@ -158,6 +161,8 @@ function AppContent() {
           <Route path="/course/:slug" element={<CourseDetail />} />
           <Route path="/dashboard/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard/affiliate-account" element={<AffiliateAccount />} />
+          <Route path="/dashboard/affiliate-overview" element={<AffiliateOverview />} />
+
           <Route path="*" element={<div>404: Page Not Found</div>} />
 
           {/* courses */}

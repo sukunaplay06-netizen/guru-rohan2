@@ -130,6 +130,8 @@ const Dashboard = () => {
             { icon: 'fas fa-home', label: 'Dashboard', active: true, path: '/dashboard' },
             { icon: 'fas fa-chart-line', label: 'My Courses', path: '/dashboard/my-courses' },
             { icon: 'fas fa-wallet', label: 'Commissions', path: '/dashboard/affiliate-account' },
+            { icon: 'fas fa-user-circle', label: 'Affiliate Overview', path: '/dashboard/affiliate-overview' },
+
             { icon: 'fas fa-users', label: 'Referrals', path: '/dashboard/referral-downline' },
             { icon: 'fas fa-file-invoice-dollar', label: 'Payouts', path: '/dashboard/payout-settings' },
             { icon: 'fas fa-cog', label: 'Profile', path: '/dashboard/profile' },
@@ -228,8 +230,9 @@ const Dashboard = () => {
                 { icon: 'fas fa-home', label: 'Dashboard', active: true, path: '/dashboard' },
                 { icon: 'fas fa-chart-line', label: 'My Courses', path: '/dashboard/my-courses' },
                 { icon: 'fas fa-wallet', label: 'Commissions', path: '/dashboard/affiliate-account' },
-                { icon: 'fas fa-users', label: 'Referrals', path: '/dashboard/referral-downline' },
+                { icon: 'fas fa-user-circle', label: 'Affiliate Overview', path: '/dashboard/affiliate-overview' },
 
+                { icon: 'fas fa-users', label: 'Referrals', path: '/dashboard/referral-downline' },
                 { icon: 'fas fa-file-invoice-dollar', label: 'Payouts', path: '/dashboard/payout-settings' },
                 { icon: 'fas fa-cog', label: 'Profile', path: '/dashboard/profile' },
                 { icon: 'fas fa-question-circle', label: 'Leaderboard', path: '/dashboard/leaderboard' },

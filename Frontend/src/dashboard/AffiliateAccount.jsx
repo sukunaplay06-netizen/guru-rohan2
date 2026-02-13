@@ -226,14 +226,14 @@ const AffiliateAccount = () => {
 
 
         {/* 👈 UPDATED: User Info Section - Conditional if user exists */}
-        <Card className="p-6 mb-8 bg-white rounded-2xl shadow-md border border-gray-100">
+
+        {/* <Card className="p-6 mb-8 bg-white rounded-2xl shadow-md border border-gray-100">
           <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
             👤 User Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 
-            {/* Left column */}
             <div className="space-y-3">
               <p className="text-gray-500 text-sm">Full Name</p>
               <p className="text-gray-800 font-medium">
@@ -246,7 +246,6 @@ const AffiliateAccount = () => {
               <p className="text-gray-800 font-medium">{user.email || 'N/A'}</p>
             </div>
 
-            {/* Right column */}
             <div className="space-y-3">
               <p className="text-gray-500 text-sm">Referral Code</p>
               <p className="text-gray-800 font-medium">{user.referralCode || 'N/A'}</p>
@@ -262,14 +261,14 @@ const AffiliateAccount = () => {
                 </div>
               )}
             </div>
-
-
           </div>
-        </Card>
+        </Card> */}
 
 
         {/* 👈 UPDATED: Referral Link Section - Conditional */}
-        <Card className="p-6 mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl shadow-xl backdrop-blur-md">
+
+        
+        {/* <Card className="p-6 mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl shadow-xl backdrop-blur-md">
           <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -300,9 +299,8 @@ const AffiliateAccount = () => {
               </svg>
               <span>Copy Link</span>
             </Button>
-
           </div>
-        </Card>
+        </Card> */}
 
 
       </div>
