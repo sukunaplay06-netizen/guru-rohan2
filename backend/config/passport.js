@@ -7,21 +7,33 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "/api/auth/google/callback",
+
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        let user = await User.findOne({
+          $or: [
+            { googleId: profile.id },
+            { email: profile.emails[0].value }
+          ]
+        });
 
         if (!user) {
           user = new User({
+            googleId: profile.id, // 🔥 IMPORTANT ADD THIS
             firstName: profile.name.givenName,
             lastName: profile.name.familyName,
             email: profile.emails[0].value,
             profilePicture: profile.photos[0].value,
             myReferralCode: "goo" + Math.floor(1000 + Math.random() * 9000),
-            password: null, // password nahi hoga Google users ke liye
+            password: null,
           });
+
+          await user.save();
+        } else if (!user.googleId) {
+          // Agar email se mila but googleId nahi tha to update kar do
+          user.googleId = profile.id;
           await user.save();
         }
 

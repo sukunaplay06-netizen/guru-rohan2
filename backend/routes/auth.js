@@ -23,14 +23,25 @@ function generateSimpleReferralCode(name) {
 // 🧠 Signup Route
 
 router.post("/signup", async (req, res) => {
-  const { firstName, lastName, email, mobile, state, password, name, referredBy } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    mobile,
+    state,
+    password,
+    name,
+    referredBy,
+  } = req.body;
 
   console.log("Signup request body:", req.body); // Debug log
 
   try {
     // Validate required fields
     if (!firstName || !lastName || !email || !state || !password || !name) {
-      return res.status(400).json({ message: "Please fill in all required fields" });
+      return res
+        .status(400)
+        .json({ message: "Please fill in all required fields" });
     }
 
     // Check if user already exists
@@ -82,7 +93,7 @@ router.post("/signup", async (req, res) => {
     if (referredByUserId) {
       await User.updateOne(
         { _id: referredByUserId },
-        { $push: { referralHistory: user._id } }
+        { $push: { referralHistory: user._id } },
       );
       console.log("Updated referralHistory for referrer:", referredByUserId);
     }
@@ -111,19 +122,28 @@ router.post("/signup", async (req, res) => {
 });
 
 // 🔐 Login Route
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email }).select('firstName lastName email name affiliateId referralCode referredBy isAdmin profilePicture password');
+    const user = await User.findOne({ email }).select(
+      "firstName lastName email name affiliateId referralCode referredBy isAdmin profilePicture password",
+    );
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user.password) {
+      return res.status(400).json({ message: "Please login with Google" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
     const userData = {
       id: user._id,
       email: user.email,
@@ -136,29 +156,32 @@ router.post('/login', async (req, res) => {
       isAdmin: user.isAdmin,
       profilePicture: user.profilePicture,
     };
-    console.log('✅ [auth.js] Login user data:', { userData, timestamp: new Date().toISOString() });
+    console.log("✅ [auth.js] Login user data:", {
+      userData,
+      timestamp: new Date().toISOString(),
+    });
     res.json({ token, user: userData });
   } catch (error) {
-    console.error('❌ [auth.js] Login error:', { message: error.message, timestamp: new Date().toISOString() });
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("❌ [auth.js] Login error:", {
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
 // 🧾 Get referrals of the logged-in user
-router.get("/me/referrals", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token provided" });
-
+router.get("/me/referrals", protect, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const referrals = await User.find({ referredBy: decoded.id }).select(
-      "firstName email createdAt"
-    );
+    const referrals = await User.find({ referredBy: req.user._id })
+      .select("firstName email createdAt");
+
     res.json({ referrals });
   } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 // New routes for profile picture
 router.put(
   "/profile",
@@ -171,13 +194,16 @@ router.put(
     }
     next(); // Proceed to authController.updateProfile
   },
-  authController.updateProfile
+  authController.updateProfile,
 );
 
 // Add this route before module.exports
-router.get('/me', protect, async (req, res) => {
-  console.time('authMeRoute');
-  console.log('🔍 [auth.js] /auth/me called:', { userId: req.user._id, timestamp: new Date().toISOString() });
+router.get("/me", protect, async (req, res) => {
+  console.time("authMeRoute");
+  console.log("🔍 [auth.js] /auth/me called:", {
+    userId: req.user._id,
+    timestamp: new Date().toISOString(),
+  });
 
   try {
     const response = {
@@ -195,21 +221,54 @@ router.get('/me', protect, async (req, res) => {
         profilePicture: req.user.profilePicture,
       },
     };
-    console.log('✅ [auth.js] /auth/me response:', {
+    console.log("✅ [auth.js] /auth/me response:", {
       userId: req.user._id,
       data: response.user,
       timestamp: new Date().toISOString(),
     });
     res.json(response);
-    console.timeEnd('authMeRoute');
+    console.timeEnd("authMeRoute");
   } catch (error) {
-    console.error('❌ [auth.js] /auth/me error:', { message: error.message, timestamp: new Date().toISOString() });
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    console.error("❌ [auth.js] /auth/me error:", {
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 });
 
 // In auth.js, add this route before module.exports
 router.get("/profile", protect, authController.getProfile);
 router.delete("/profile-picture", protect, authController.removeProfilePicture);
+
+const passport = require("passport");
+
+// 🔵 Start Google Login
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
+
+// 🔵 Google Callback
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  async (req, res) => {
+    try {
+      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+      });
+
+      // ⚠️ Yaha apna frontend URL daalo
+      res.redirect(
+        `https://leadsgurukul.com/oauth-success?token=${token}`,
+      );
+    } catch (error) {
+      res.status(500).json({ message: "Google login failed" });
+    }
+  },
+);
 
 module.exports = router;

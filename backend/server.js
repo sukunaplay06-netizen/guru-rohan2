@@ -67,6 +67,12 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+const passport = require("passport");
+require("./config/passport");
+
+app.use(passport.initialize());
+
 app.use(require("cookie-parser")());
 
 // Replace existing Multer configuration block
@@ -168,6 +174,14 @@ app.get("/api/health", (req, res) => {
     success: true,
     message: "Server is healthy",
     timestamp: new Date(),
+  });
+});
+
+// 👇 YAHAN ADD KARO
+app.get("/api/check-google", (req, res) => {
+  res.json({
+    clientId: process.env.GOOGLE_CLIENT_ID ? "EXISTS" : "MISSING",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ? "EXISTS" : "MISSING",
   });
 });
 
