@@ -7,16 +7,12 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
-
+      callbackURL: "https://guru-rohan2.onrender.com/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         let user = await User.findOne({
-          $or: [
-            { googleId: profile.id },
-            { email: profile.emails[0].value }
-          ]
+          $or: [{ googleId: profile.id }, { email: profile.emails[0].value }],
         });
 
         if (!user) {
@@ -41,8 +37,8 @@ passport.use(
       } catch (err) {
         return done(err, null);
       }
-    }
-  )
+    },
+  ),
 );
 
 passport.serializeUser((user, done) => {
