@@ -191,7 +191,7 @@ function Signup({ updateAuthState, intendedCourse }) {
 
           <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-md font-bold">Sign Up</button>
           {/* ✅ Google Sign-in Button */}
-          <div className="mt-4">
+          {/* <div className="mt-4">
             <a
               href={
                 import.meta.env.MODE === "development"
@@ -203,7 +203,7 @@ function Signup({ updateAuthState, intendedCourse }) {
               <img src="/google-icon.png" alt="Google" className="w-5 h-5" />
               <span>Continue with Google</span>
             </a>
-          </div>
+          </div> */}
 
         </form>
       </div>
