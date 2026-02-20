@@ -193,7 +193,11 @@ function Signup({ updateAuthState, intendedCourse }) {
           {/* ✅ Google Sign-in Button */}
           <div className="mt-4">
             <a
-              href="https://guru-rohan2.onrender.com/api/auth/google"
+              href={
+                import.meta.env.MODE === "development"
+                  ? "http://localhost:5001/api/auth/google"
+                  : "https://guru-rohan2.onrender.com/api/auth/google"
+              }
               className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-md hover:bg-gray-100 transition"
             >
               <img src="/google-icon.png" alt="Google" className="w-5 h-5" />

@@ -60,6 +60,7 @@ import GrievanceRedressal from './pages/GrievanceRedressal';
 import LegalNotice from './pages/LegalNotice';
 
 import AffiliateOverview from "./dashboard/AffiliateOverview";
+import OAuthSuccess from './pages/OAuthSuccess';
 
 
 function PublicLayout({ children }) {
@@ -200,6 +201,7 @@ function AppContent() {
           <Route path="/auth/affiliate-disclaimer" element={<AffiliateDisclaimer />} />
           <Route path="/auth/grievance-redressal" element={<GrievanceRedressal />} />
           <Route path="/auth/legal-notice" element={<LegalNotice />} />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
 
 
         </Routes>

@@ -173,8 +173,9 @@ router.post("/login", async (req, res) => {
 // 🧾 Get referrals of the logged-in user
 router.get("/me/referrals", protect, async (req, res) => {
   try {
-    const referrals = await User.find({ referredBy: req.user._id })
-      .select("firstName email createdAt");
+    const referrals = await User.find({ referredBy: req.user._id }).select(
+      "firstName email createdAt",
+    );
 
     res.json({ referrals });
   } catch (error) {
@@ -251,22 +252,44 @@ router.get(
   passport.authenticate("google", { scope: ["profile", "email"] }),
 );
 
-// 🔵 Google Callback
+// 🔵 Google Callback – improved version
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL || "http://localhost:5173"}/login?error=google_auth_failed`,
+  }),
   async (req, res) => {
     try {
+      console.log("✅ [Google Callback] Success – user:", {
+        id: req.user?._id,
+        email: req.user?.email,
+        timestamp: new Date().toISOString(),
+      });
+
       const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
         expiresIn: "30d",
       });
 
-      // ⚠️ Yaha apna frontend URL daalo
-      res.redirect(
-        `https://leadsgurukul.com/oauth-success?token=${token}`,
-      );
+      // Dynamic frontend URL – .env se le ya fallback localhost
+      const frontendBaseUrl =
+        process.env.FRONTEND_URL || "http://localhost:5173";
+
+      const redirectUrl = `${frontendBaseUrl}/oauth-success?token=${token}`;
+
+      console.log("Redirecting to:", redirectUrl);
+
+      res.redirect(redirectUrl);
     } catch (error) {
-      res.status(500).json({ message: "Google login failed" });
+      console.error("❌ [Google Callback] Error:", {
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      });
+
+      const frontendBaseUrl =
+        process.env.FRONTEND_URL || "http://localhost:5173";
+      res.redirect(`${frontendBaseUrl}/login?error=google_callback_failed`);
     }
   },
 );

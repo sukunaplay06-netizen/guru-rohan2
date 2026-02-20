@@ -7,9 +7,10 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://guru-rohan2.onrender.com/api/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
+      console.log("🔵 GOOGLE STRATEGY CALLED");
       try {
         let user = await User.findOne({
           $or: [{ googleId: profile.id }, { email: profile.emails[0].value }],
