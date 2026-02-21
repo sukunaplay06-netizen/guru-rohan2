@@ -1,10 +1,13 @@
 // src/pages/Courses.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 
-function Courses({ isLoggedIn, setIntendedCourse }) {
+function Courses() {
+  const { isLoggedIn } = useContext(AuthContext);
+
   const [courses, setCourses] = useState([]);
   const [enrolledCourseSlugs, setEnrolledCourseSlugs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,21 +15,11 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // console.log("Courses component mounted. isLoggedIn:", isLoggedIn);
-    // console.log("Current URL:", window.location.href);
-    // console.log("Query Parameters:", window.location.search);
-
     const fetchCourses = async () => {
       try {
-        // console.log("Fetching courses from /courses...");
         const res = await api.get('/courses');
-        
-        // console.log('API Response:', res);
-        // console.log('Fetched courses data:', res.data);
         setCourses(res.data);
       } catch (err) {
-        // console.error('Error fetching courses:', err);
-        // console.error('Error details:', err.response?.data, err.response?.status);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -36,18 +29,13 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
 
     if (isLoggedIn) {
       const user = JSON.parse(localStorage.getItem('user'));
-      // console.log('User from localStorage:', user);
       if (user && user.enrolledCourses) {
-        // console.log('Enrolled courses:', user.enrolledCourses);
         setEnrolledCourseSlugs(user.enrolledCourses.map((c) => c.slug));
-      } else {
-        // console.log('No user or enrolled courses found in localStorage');
       }
     }
   }, [isLoggedIn]);
 
   const handleBuyNow = (courseSlug) => {
-    // console.log('Buy Now clicked for:', courseSlug);
     if (!isLoggedIn) {
       localStorage.setItem('intendedCourse', courseSlug);
       navigate('/auth/signup');
@@ -59,11 +47,9 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '64px' }}>Loading courses...</div>;
   }
-
   if (error) {
     return <div style={{ textAlign: 'center', padding: '64px', color: 'red' }}>Error: {error}</div>;
   }
-
   if (courses.length === 0) {
     return <div style={{ textAlign: 'center', padding: '64px' }}>No courses available.</div>;
   }
@@ -73,7 +59,6 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
       <h2 className="text-4xl font-bold text-gray-900 mb-10">
         Our Courses
       </h2>
-
       <div className="grid gap-8 max-w-[1280px] mx-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {courses.map((course, index) => (
           <motion.div
@@ -91,27 +76,10 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
               }
               className="w-full h-48 object-cover rounded-t-lg mb-4"
             />
-
             <p className="text-gray-600 font-medium mb-2">
               {course.name || 'Unnamed Course'}
             </p>
-
             <p className="mb-4">
-              {/* {course.discount ? (
-                <>
-                  <span className="line-through text-red-500 mr-2 text-base">
-                    ₹{Math.round(course.price || 0).toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-green-500 font-bold text-2xl">
-                    ₹{Math.round((course.price || 0) * (1 - (course.discount || 0) / 100)).toLocaleString('en-IN')}
-                  </span>
-                </>
-              ) : (
-                <span className="text-green-500 font-bold text-2xl">
-                  ₹{Math.round(course.price || 0).toLocaleString('en-IN')}
-                </span>
-              )} */}
-
               {course.discount ? (
                 <>
                   <span className="line-through text-red-500 mr-2 text-base">
@@ -126,9 +94,7 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
                   ₹{Math.round(course.price || 0).toLocaleString('en-IN')}
                 </span>
               )}
-
             </p>
-
             <div className="flex justify-center gap-3 mt-auto">
               <Link
                 to={`/api/courses/${course.slug}`}
@@ -160,5 +126,4 @@ function Courses({ isLoggedIn, setIntendedCourse }) {
 
   );
 }
-
 export default Courses;

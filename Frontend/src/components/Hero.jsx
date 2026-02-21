@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import Courses from "../pages/Courses"; // Adjust the path if needed
-
+import Courses from "../pages/Courses"; // Adjust the path if need
+import { AuthContext } from '../context/AuthContext';
 
 function Hero() {
+  const { isLoggedIn } = useContext(AuthContext);
   return (
     <div className="bg-gray-100">
       {/* Hero Section */}
@@ -20,7 +21,8 @@ function Hero() {
       </section>
 
 
-      <Courses isLoggedIn={false} />
+      {/* <Courses isLoggedIn={false} /> */}
+      <Courses isLoggedIn={isLoggedIn} />
       {/* Features Section */}
       <section className="py-16 px-4 md:px-8 bg-gray-50">
         <h2 className="text-3xl font-extrabold text-center mb-12 text-gray-900 transition duration-300 hover:text-orange-600">
