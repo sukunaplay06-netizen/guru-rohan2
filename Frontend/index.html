@@ -1,117 +1,83 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ✅ Favicon Setup (Mobile + Desktop FIX ok) -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Browser Tab -->
-    <!-- <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
- <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
- <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"> -->
+  <!-- ✅ Favicon Setup (Mobile + Desktop FIX ok) -->
 
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <!-- Browser Tab -->
 
-    <!-- Android -->
-    <!-- <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
- <meta name="msapplication-TileImage" content="/favicon-192x192.png"> -->
 
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/favicon-192x192.png"
-    />
-    <meta name="msapplication-TileImage" content="/favicon-192x192.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
 
-    <!-- Apple iOS -->
-    <!-- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"> -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/web-app-manifest-192x192.png" />
 
-    <!-- <link rel="manifest" href="/site.webmanifest"> -->
-    <link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/web-app-manifest-512x512.png" />
 
-    <!-- 🔥 SEO Title -->
-    <title>LeadsGurukul | Online Learning & Skill Development in India</title>
+  <meta name="msapplication-TileImage" content="/web-app-manifest-192x192.png" />
 
-    <!-- 🔥 SEO Description -->
-    <meta
-      name="description"
-      content="Leadsgurukul offers the finest online learning courses in India. Join now to enhance your skills and career!"
-    />
+  <!-- Apple iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <!-- 🔥 SEO Title -->
+  <title>LeadsGurukul | Online Learning & Skill Development in India</title>
 
-    <!-- 🔥 Keywords -->
-    <meta
-      name="keywords"
-      content="online learning, digital skills, skill development, online courses, LeadsGurukul"
-    />
+  <!-- 🔥 SEO Description -->
+  <meta name="description"
+    content="Leadsgurukul offers the finest online learning courses in India. Join now to enhance your skills and career!" />
 
-    <!-- 🔥 Robots -->
-    <meta name="robots" content="index, follow" />
+  <!-- 🔥 Keywords -->
+  <meta name="keywords" content="online learning, digital skills, skill development, online courses, LeadsGurukul" />
 
-    <!-- 🔥 Author -->
-    <meta name="author" content="LeadsGurukul" />
+  <!-- 🔥 Robots -->
+  <meta name="robots" content="index, follow" />
 
-    <!-- 🔥 Theme Color (Mobile Browser) -->
-    <meta name="theme-color" content="#0f172a" />
+  <!-- 🔥 Author -->
+  <meta name="author" content="LeadsGurukul" />
 
-    <!-- 🔥 Open Graph (Facebook, WhatsApp) -->
-    <meta
-      property="og:title"
-      content="LeadsGurukul — Skills That Shape Your Future"
-    />
-    <meta
-      property="og:description"
-      content="A modern learning platform to build skills, gain knowledge, and move ahead with confidence."
-    />
-    <!-- <meta property="og:image" content="https://leadsgurukul.com/android.png" /> -->
+  <!-- 🔥 Theme Color (Mobile Browser) -->
+  <meta name="theme-color" content="#0f172a" />
 
-    <meta property="og:type" content="website" />
+  <!-- 🔥 Open Graph (Facebook, WhatsApp) -->
+  <meta property="og:title" content="LeadsGurukul — Skills That Shape Your Future" />
+  <meta property="og:description"
+    content="A modern learning platform to build skills, gain knowledge, and move ahead with confidence." />
 
-    <meta property="og:url" content="https://leadsgurukul.com/" />
+  <meta property="og:type" content="website" />
 
-    <!-- 🔥 Twitter / X Preview -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="LeadsGurukul — Skills That Shape Your Future"
-    />
-    <meta
-      name="twitter:description"
-      content="A modern learning platform to build skills, gain knowledge, and move ahead with confidence."
-    />
-    <!-- <meta name="twitter:image" content="https://leadsgurukul.com/android.png" /> -->
 
-    <meta property="og:image" content="https://leadsgurukul.com/lead2.png" />
-    <meta name="twitter:image" content="https://leadsgurukul.com/lead2.png" />
-    <!-- 🔥 Canonical URL -->
-    <link rel="canonical" href="https://leadsgurukul.com/" />
+  <meta property="og:url" content="https://leadsgurukul.com/" />
 
-    <!-- CSS + Fonts -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+  <meta property="og:image" content="https://leadsgurukul.com/lead2.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+  <!-- 🔥 Twitter / X Preview -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LeadsGurukul — Skills That Shape Your Future" />
+  <meta name="twitter:description"
+    content="A modern learning platform to build skills, gain knowledge, and move ahead with confidence." />
+  <meta name="twitter:image" content="https://leadsgurukul.com/lead2.png" />
+  <!-- 🔥 Canonical URL -->
+  <link rel="canonical" href="https://leadsgurukul.com/" />
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  </body>
+  <!-- CSS + Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- React main file -->
+  <script type="module" src="/src/main.jsx"></script>
+  <!-- Razorpay payment script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+
 </html>
