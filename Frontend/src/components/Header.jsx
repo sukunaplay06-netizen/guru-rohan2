@@ -1,7 +1,7 @@
 //Frontend/src/components/Header.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/ro.png"; 
+import Logo from "../assets/ro.png";
 
 
 function Header() {
@@ -13,16 +13,16 @@ function Header() {
     return `${path}?ref=${encodeURIComponent(refCode.trim())}`;
   };
   return (
-    <header className="bg-white shadow-md py-4 px-4 md:px-10">
+    <header className="bg-white shadow-md py-5 px-4 md:px-10 sticky top-0 z-50 relative">
       <nav className="flex justify-between items-center max-w-7xl mx-auto">
-       
+
 
         <div className="flex items-center">
           <Link to={appendRef("/")}>
             <img
               src={Logo}
               alt="ro"
-              className="h-10 sm:h-12" // height adjust karo apne design ke hisaab se
+              className="h-12 sm:h-14 md:h-16 lg:h-18 xl:h-20 w-auto"
             />
           </Link>
         </div>
@@ -68,7 +68,7 @@ function Header() {
         <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-md bg-gray-100"
+            className="p-3 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
           >
             ☰
           </button>
@@ -136,7 +136,7 @@ function Header() {
 
       {/* Mobile Menu Dropdown */}
       {isOpen && (
-        <div className="absolute top-16 left-0 w-full bg-white rounded-b-2xl shadow-xl z-50 md:hidden animate-slide-down">
+        <div className="absolute left-0 top-full w-full bg-white rounded-b-2xl shadow-xl z-50 md:hidden animate-slide-down">
           <div className="flex flex-col divide-y divide-gray-200">
 
             <Link
