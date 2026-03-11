@@ -1,26 +1,12 @@
 //Frontend/src/components/Header.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/lead2.png"; // adjust the path according to your folder structure
+import Logo from "../assets/ro.png"; 
 
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const refCode = localStorage.getItem("referralCode");
-
-  // const appendRef = (path) => (refCode ? `${path}?ref=${refCode}` : path);
-  // const appendRef = (path) => {
-  //   const generatedPath = refCode ? `${path}?ref=${refCode}` : path;
-  // console.log("refCode:", refCode);
-  // console.log("Generated path:", generatedPath);
-  //   return generatedPath;
-  // };
-
-
-  // const appendRef = (path) => {
-  //   if (!refCode || refCode.trim() === '') return path;
-  //   return `${path}?ref=${refCode.trim()}`;
-  // };
 
   const appendRef = (path) => {
     if (!refCode || refCode.trim() === '') return path;
@@ -29,16 +15,13 @@ function Header() {
   return (
     <header className="bg-white shadow-md py-4 px-4 md:px-10">
       <nav className="flex justify-between items-center max-w-7xl mx-auto">
-        {/* Logo */}
-        {/* <div className="text-2xl font-bold text-gray-900">
-          <Link to={appendRef("/")}>leadsgurukul</Link>
-        </div> */}
+       
 
         <div className="flex items-center">
           <Link to={appendRef("/")}>
             <img
               src={Logo}
-              alt="lead2"
+              alt="ro"
               className="h-10 sm:h-12" // height adjust karo apne design ke hisaab se
             />
           </Link>

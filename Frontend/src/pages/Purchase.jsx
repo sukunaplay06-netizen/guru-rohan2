@@ -102,7 +102,7 @@ function Purchase() {
         amount: orderAmount,
         currency: "INR",
         name: "Leadsgurukul",
-        image: "https://leadsgurukul.com/lead2.png",
+        image: "https://leadsgurukul.com/ro.png",
         description: course.name,
         order_id,
         handler: async function (response) {

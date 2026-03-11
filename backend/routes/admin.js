@@ -271,4 +271,64 @@ router.get('/chat/messages', protect, admin, async (req, res) => {  // authAdmin
   }
 });
 
+//sab existing code ke upar ya neeche daal do
+
+router.post('/visitor/track', async (req, res) => {
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip || 'unknown';
+    const { page = window.location?.pathname || 'home' } = req.body;  // optional page info
+
+    // Aaj ke liye check karo ki ye IP already aaya hai kya (unique ke liye)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const existingToday = await Visitor.findOne({
+      ip,
+      date: { $gte: todayStart }
+    });
+
+    const visitor = new Visitor({
+      ip,
+      page,
+      // Agar logged in hai to userId bhi save kar sakte ho (optional)
+      userId: req.user?._id || null
+    });
+
+    await visitor.save();
+
+    res.json({ success: true, message: 'Visit tracked' });
+  } catch (err) {
+    console.error('Visitor track error:', err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// Admin ke liye visitors stats endpoint
+router.get('/dashboard/visitors', authAdmin, async (req, res) => {
+  try {
+    // Total visits (all time)
+    const totalVisits = await Visitor.countDocuments();
+
+    // Unique visitors all time (distinct IPs)
+    const uniqueAllTime = await Visitor.distinct('ip').then(ips => ips.length);
+
+    // Aaj ke
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayVisits = await Visitor.countDocuments({ date: { $gte: todayStart } });
+    const todayUnique = await Visitor.distinct('ip', { date: { $gte: todayStart } }).then(ips => ips.length);
+
+    res.json({
+      totalVisits,
+      uniqueVisitors: uniqueAllTime,
+      todayVisits,
+      todayUniqueVisitors: todayUnique
+    });
+  } catch (err) {
+    console.error('Visitors stats error:', err);
+    res.status(500).json({ message: 'Failed to fetch visitor stats' });
+  }
+});
+
 module.exports = router;
