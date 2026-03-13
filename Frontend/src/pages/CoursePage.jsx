@@ -11,16 +11,26 @@ function CoursePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
- useEffect(() => {
-  if (user === undefined) return;  // wait for AuthContext to load
+  const fetchReviews = async (courseId) => {
+    try {
+      const res = await axios.get(`/reviews/course/${courseId}`);
+      setReviews(res.data);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
+  };
 
-  if (!user) {
-    navigate("/auth/login");
-  }
-}, [user]);
+  useEffect(() => {
+    if (user === undefined) return;
+
+    if (!user) {
+      navigate("/auth/login");
+    }
+  }, [user]);
 
 
   useEffect(() => {
@@ -32,18 +42,13 @@ function CoursePage() {
         const res = await axios.get(`/courses/slug/${slug}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        // console.log("[CoursePage] Course data received:", {
-        //   id: res.data._id,
-        //   name: res.data.name,
-        //   hasPurchased: res.data.hasPurchased,
-        //   videos: res.data.videos.map((v) => ({
-        //     title: v.title,
-        //     url: v.url ? "Included" : "Hidden",
-        //     freePreview: v.freePreview,
-        //   })),
-        // });
+
         setCourse(res.data);
         setError(null);
+        if (res.data._id) {
+          fetchReviews(res.data._id);
+        }
+
       } catch (err) {
         // console.error("[CoursePage] Error fetching course:", err.response?.data || err.message);
         setError("Failed to load course. Please try again later.");
@@ -79,11 +84,7 @@ function CoursePage() {
       </div>
     );
 
-  // console.log("[CoursePage] Rendering course:", {
-  //   name: course.name,
-  //   hasPurchased: course.hasPurchased,
-  //   videoCount: course.videos.length,
-  // });
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -93,7 +94,9 @@ function CoursePage() {
         <div className="flex flex-wrap gap-4 items-center mb-6">
           <div className="flex items-center space-x-2">
             <StarIcon className="w-6 h-6 text-yellow-400" />
-            <span className="text-lg">{course.rating || "4.5"} ({"1,234 reviews"})</span>
+            <span className="text-lg">
+              {course.rating || "4.5"} ({reviews.length} reviews)
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <ClockIcon className="w-6 h-6" />
@@ -124,12 +127,7 @@ function CoursePage() {
         {course.hasPurchased && course.videos && course.videos.length > 0 ? (
           <Accordion type="single" collapsible className="space-y-3">
             {course.videos.map((video, index) => {
-              // console.log("[CoursePage] Rendering video:", {
-              //   title: video.title,
-              //   url: video.url ? "Included" : "Hidden",
-              //   freePreview: video.freePreview,
-              //   hasPurchased: course.hasPurchased,
-              // });
+
               return (
                 <AccordionItem
                   key={index}
@@ -225,6 +223,54 @@ function CoursePage() {
               )}
             </ul>
           </div>
+        </div>
+        {/* Student Reviews Section */}
+
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Student Reviews
+          </h2>
+
+          {reviews.length === 0 ? (
+            <p className="text-gray-500">No reviews yet.</p>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+
+              {reviews.map((review) => (
+                <div
+                  key={review._id}
+                  className="bg-gray-50 p-6 rounded-xl shadow hover:shadow-md transition"
+                >
+
+                  <div className="flex items-center mb-3">
+
+                    <img
+                      src={review.image || "https://i.pravatar.cc/100"}
+                      className="w-10 h-10 rounded-full mr-3"
+                      alt="user"
+                    />
+
+                    <div>
+                      <p className="font-semibold">
+                        {review.user?.name}
+                      </p>
+
+                      <p className="text-yellow-500">
+                        {"⭐".repeat(review.rating || 0)}
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <p className="text-gray-600">
+                    {review.comment}
+                  </p>
+
+                </div>
+              ))}
+
+            </div>
+          )}
         </div>
         <div className="mt-8 text-center">
           <Button

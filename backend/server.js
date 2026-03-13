@@ -142,6 +142,7 @@ const Message = require("./models/Message");
 const leaderboardRoutes = require("./routes/leaderboard");
 
 const contactRoutes = require("./routes/contact");
+const reviewRoutes = require("./routes/reviewRoutes");
 // Add this at the top, after the imports
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
@@ -161,6 +162,7 @@ app.use("/api/videos", uploadRoute);
 app.use("/api/videos", videoRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.use(cookieParser());
 
