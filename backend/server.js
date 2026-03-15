@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
@@ -14,7 +13,7 @@ const { Server } = require("socket.io");
 const chatRoutes = require("./routes/chatRoutes");
 
 // Load .env variables
-dotenv.config();
+// dotenv.config();
 
 // Validate environment variables
 const requiredEnvVars = [
@@ -39,8 +38,8 @@ requiredEnvVars.forEach((varName) => {
 const app = express();
 
 // ✅ Middlewares
-app.use(helmet()); // Security headers
-app.use(morgan("combined")); // Request logging
+app.use(helmet()); 
+app.use(morgan("combined"));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -51,14 +50,6 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
-// ✅ Middlewares
-// const corsOptions = {
-//   origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-//   credentials: true,
-// };
-// app.use(cors(corsOptions));
 
 // ✅ FINAL CORS FIX - localhost + Vercel + mobile sab chalega forever
 app.use(cors({
@@ -157,14 +148,14 @@ app.use("/api/user", userRoutes); // ✅ User routes
 app.use("/api/referral", referralRoutes);
 app.use("/api/purchase", purchaseRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/auth", resetPasswordRoutes);
+// app.use("/api/auth", resetPasswordRoutes);
 app.use("/api/videos", uploadRoute);
 app.use("/api/videos", videoRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-app.use(cookieParser());
+// app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -220,13 +211,6 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
-// ✅ Socket.io Setup for Real-time Chat
-// const io = new Server(server, {
-//   cors: {
-//     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-//     methods: ["GET", "POST"],
-//   },
-// });
 
 const io = new Server(server, {
   cors: {

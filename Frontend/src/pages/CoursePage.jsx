@@ -15,12 +15,28 @@ function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchReviews = async (courseId) => {
+  const fetchCourse = async () => {
     try {
-      const res = await axios.get(`/reviews/course/${courseId}`);
-      setReviews(res.data);
+
+      console.log("📤 Fetching all courses...");
+
+      const res = await api.get("/courses");
+
+      console.log("📥 Courses response:", res.data);
+
+      const selectedCourse =
+        res.data.find((c) => c.slug === "supreme") || res.data[0];
+
+      console.log("✅ Selected course:", selectedCourse);
+
+      setCourse(selectedCourse);
+
+      if (selectedCourse?._id) {
+        fetchReviews(selectedCourse._id);
+      }
+
     } catch (err) {
-      console.error("Error fetching reviews:", err);
+      console.error("❌ Error fetching course:", err);
     }
   };
 
@@ -252,7 +268,7 @@ function CoursePage() {
 
                     <div>
                       <p className="font-semibold">
-                        {review.user?.name}
+                         {review.user?.firstName} {review.user?.lastName}
                       </p>
 
                       <p className="text-yellow-500">

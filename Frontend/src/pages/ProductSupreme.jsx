@@ -5,16 +5,6 @@ import api from "../api/axios";
 
 function ProductSupreme() {
   const [course, setCourse] = useState(null);
-  const [reviews, setReviews] = useState([]);
-
-  const fetchReviews = async (courseId) => {
-    try {
-      const res = await api.get(`/reviews/course/${courseId}`);
-      setReviews(res.data);
-    } catch (err) {
-      console.error("Error fetching reviews:", err);
-    }
-  };
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -23,9 +13,6 @@ function ProductSupreme() {
         const selectedCourse =
           res.data.find((c) => c.slug === "supreme") || res.data[0];
         setCourse(selectedCourse);
-        if (selectedCourse?._id) {
-          fetchReviews(selectedCourse._id);
-        }
       } catch (err) {
         console.error("Error fetching course:", err);
       }
@@ -84,7 +71,7 @@ function ProductSupreme() {
           {[
             { icon: "/coursesImg/course_icon.png", label: "50+ Courses" },
             { icon: "/coursesImg/hours_icon.png", label: "250+ Hours" },
-            { icon: "/coursesImg/students_icon.png", label: "15K+ Students" },
+            { icon: "/coursesImg/students_icon.png", label: "15K+ Students" }, 
             { icon: "/coursesImg/certificate_icon.png", label: "Certificate" },
           ].map((stat, i) => (
             <div
@@ -112,46 +99,46 @@ function ProductSupreme() {
           <div className="grid md:grid-cols-2 gap-10">
             {[
 
-              {
-                title: "ChatGPT Fundamentals",
-                points: [
-                  "Understanding ChatGPT, OpenAI & Generative AI",
-                  "How Large Language Models Work",
-                  "ChatGPT Interface & Advanced Features",
-                  "Free vs Pro Version Explained",
-                  "Prompt Writing Basics with Examples",
-                ],
-              },
-              {
-                title: "Prompt Engineering Mastery",
-                points: [
-                  "What is Prompt Engineering & Why It Matters",
-                  "Crafting Perfect Prompts for Any Goal",
-                  "Advanced Prompt Frameworks (CUP, ROLE, CHAIN)",
-                  "ChatGPT for Copywriting, Marketing & Research",
-                  "Building Reusable Prompt Templates",
-                ],
-              },
-              {
-                title: "AI Tools & Automation",
-                points: [
-                  "Integrating ChatGPT with Google Sheets, Docs, and Notion",
-                  "Using Zapier & Make (Integromat) for Automation",
-                  "AI Image Creation with DALL·E & Midjourney",
-                  "Using ChatGPT for Email, Social Media & CRM Automation",
-                  "Creating AI Workflows for Daily Productivity",
-                ],
-              },
-              {
-                title: "Monetizing ChatGPT Skills",
-                points: [
-                  "Freelancing with ChatGPT – Fiverr, Upwork & Agencies",
-                  "Creating & Selling Digital Products using AI",
-                  "Building a Personal Brand using ChatGPT & Canva",
-                  "How to Build Chatbots & AI Services",
-                  "Bonus: AI Business & Passive Income Ideas",
-                ],
-              },
+{
+                  title: "ChatGPT Fundamentals",
+                  points: [
+                    "Understanding ChatGPT, OpenAI & Generative AI",
+                    "How Large Language Models Work",
+                    "ChatGPT Interface & Advanced Features",
+                    "Free vs Pro Version Explained",
+                    "Prompt Writing Basics with Examples",
+                  ],
+                },
+                {
+                  title: "Prompt Engineering Mastery",
+                  points: [
+                    "What is Prompt Engineering & Why It Matters",
+                    "Crafting Perfect Prompts for Any Goal",
+                    "Advanced Prompt Frameworks (CUP, ROLE, CHAIN)",
+                    "ChatGPT for Copywriting, Marketing & Research",
+                    "Building Reusable Prompt Templates",
+                  ],
+                },
+                {
+                  title: "AI Tools & Automation",
+                  points: [
+                    "Integrating ChatGPT with Google Sheets, Docs, and Notion",
+                    "Using Zapier & Make (Integromat) for Automation",
+                    "AI Image Creation with DALL·E & Midjourney",
+                    "Using ChatGPT for Email, Social Media & CRM Automation",
+                    "Creating AI Workflows for Daily Productivity",
+                  ],
+                },
+                {
+                  title: "Monetizing ChatGPT Skills",
+                  points: [
+                    "Freelancing with ChatGPT – Fiverr, Upwork & Agencies",
+                    "Creating & Selling Digital Products using AI",
+                    "Building a Personal Brand using ChatGPT & Canva",
+                    "How to Build Chatbots & AI Services",
+                    "Bonus: AI Business & Passive Income Ideas",
+                  ],
+                },
               {
                 title: "Instagram Marketing Strategy",
                 points: [
@@ -262,31 +249,7 @@ function ProductSupreme() {
           </div>
         </div>
       </section>
-      {/* Student Reviews */}
 
-      <section className="px-6 py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12">
-            Student Reviews
-          </h2>
-
-          {reviews.length === 0 ? (
-            <p className="text-center text-gray-500">No reviews yet.</p>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {reviews.map((review) => (
-                <div key={review._id} className="bg-white p-6 rounded-xl shadow">
-                  <p className="font-semibold">{review.user?.name}</p>
-                  <p className="text-yellow-500">
-                    {"⭐".repeat(review.rating || 0)}
-                  </p>
-                  <p className="text-gray-600">{review.comment}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
       {/* Trust Badges */}
       <section className="px-6 py-16 bg-white border-t">
         <div className="max-w-5xl mx-auto text-center">
